@@ -23,7 +23,7 @@ WORKDIR /app
 #   - ffmpeg-static: ships a glibc-compiled ffmpeg binary
 #   - yt-dlp:        standalone binary compiled against glibc
 # ca-certificates: HTTPS connections (Spotify, Genius, LRCLIB, YouTube)
-RUN apk add --no-cache gcompat ca-certificates python3 su-exec
+RUN apk add --no-cache gcompat ca-certificates python3 su-exec ffmpeg
 
 COPY --from=builder /app .
 
