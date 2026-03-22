@@ -1,5 +1,11 @@
 // Load environment variables
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+
+const defaultCookiesPath = path.join(__dirname, 'database', 'cookies.txt');
+const cookiesFile = process.env.COOKIES_FILE ||
+    (fs.existsSync(defaultCookiesPath) ? defaultCookiesPath : null);
 
 module.exports = {
     // Discord Bot Settings
@@ -57,7 +63,7 @@ module.exports = {
         quality: 'highestaudio',
         highWaterMark: 1 << 25,
         cookiesFromBrowser: process.env.COOKIES_FROM_BROWSER || null, // 'chrome', 'firefox', 'edge', 'safari'
-        cookiesFile: process.env.COOKIES_FILE || null, // './cookies.txt'
+        cookiesFile, // COOKIES_FILE env → database/cookies.txt if it exists → null
         poToken: process.env.YOUTUBE_PO_TOKEN || null, // YouTube PO Token (sunucu IP'leri için)
     },
 

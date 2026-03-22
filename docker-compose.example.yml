@@ -27,14 +27,15 @@ services:
       WEBSITE: ""
 
       # ── YouTube bot-detection workaround (see YOUTUBE_FIX.md) ───────────────
-      # COOKIES_FILE: "/app/cookies.txt"
       # YOUTUBE_PO_TOKEN: ""
+      # COOKIES_FILE is auto-detected from database/cookies.txt — no need to set it
+      # unless you want to use a different path.
 
     volumes:
-      # Persists guild language preferences and player state across restarts
+      # Persists guild language preferences and player state across restarts.
+      # Drop a cookies.txt file into this volume to enable YouTube cookie auth
+      # without setting any env var (auto-detected at startup).
       - betty-db:/app/database
-      # If using a cookies.txt file for YouTube auth, mount it here:
-      # - ./cookies.txt:/app/cookies.txt:ro
 
     # ── Alternative: load all vars from your .env file ──────────────────────
     # Comment out the environment block above and uncomment this instead:
