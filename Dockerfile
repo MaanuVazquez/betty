@@ -19,10 +19,9 @@ FROM node:24-alpine
 
 WORKDIR /app
 
-# gcompat: GNU libc compatibility layer (~1 MB) required for:
-#   - ffmpeg-static: ships a glibc-compiled ffmpeg binary
-#   - yt-dlp:        standalone binary compiled against glibc
+# gcompat: GNU libc compatibility layer required for yt-dlp (compiled against glibc)
 # ca-certificates: HTTPS connections (Spotify, Genius, LRCLIB, YouTube)
+# ffmpeg: provides ffmpeg and ffprobe binaries used for audio processing
 RUN apk add --no-cache gcompat ca-certificates python3 su-exec ffmpeg
 
 COPY --from=builder /app .
