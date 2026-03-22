@@ -1,0 +1,44 @@
+# Docker Compose example for Beatra/Betty
+# Copy to docker-compose.yml and fill in your values, or use env_file (see below).
+
+services:
+  betty:
+    image: ghcr.io/<your-github-username>/<your-repo-name>:latest
+    # To build locally instead of pulling from ghcr.io, replace the line above with:
+    # build: .
+    restart: unless-stopped
+
+    environment:
+      # ── Required ────────────────────────────────────────────────────────────
+      DISCORD_TOKEN: ""
+      CLIENT_ID: ""
+
+      # ── Spotify (required for Spotify URLs) ─────────────────────────────────
+      SPOTIFY_CLIENT_ID: ""
+      SPOTIFY_CLIENT_SECRET: ""
+
+      # ── Optional ────────────────────────────────────────────────────────────
+      GUILD_ID: ""                    # Set for faster guild-scoped command deploy
+      GENIUS_CLIENT_ID: ""            # Higher Genius API rate limits
+      GENIUS_CLIENT_SECRET: ""
+      STATUS: "🎵 Betty | /play"
+      EMBED_COLOR: "#FF6B6B"
+      SUPPORT_SERVER: "https://discord.gg/"
+      WEBSITE: ""
+
+      # ── YouTube bot-detection workaround (see YOUTUBE_FIX.md) ───────────────
+      # COOKIES_FILE: "/app/cookies.txt"
+      # YOUTUBE_PO_TOKEN: ""
+
+    volumes:
+      # Persists guild language preferences and player state across restarts
+      - betty-db:/app/database
+      # If using a cookies.txt file for YouTube auth, mount it here:
+      # - ./cookies.txt:/app/cookies.txt:ro
+
+    # ── Alternative: load all vars from your .env file ──────────────────────
+    # Comment out the environment block above and uncomment this instead:
+    # env_file: .env
+
+volumes:
+  betty-db:
