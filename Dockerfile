@@ -23,7 +23,7 @@ WORKDIR /app
 #   - ffmpeg-static: ships a glibc-compiled ffmpeg binary
 #   - yt-dlp:        standalone binary compiled against glibc
 # ca-certificates: HTTPS connections (Spotify, Genius, LRCLIB, YouTube)
-RUN apk add --no-cache gcompat ca-certificates python3
+RUN apk add --no-cache gcompat ca-certificates python3 su-exec
 
 COPY --from=builder /app .
 
@@ -36,6 +36,8 @@ VOLUME ["/app/database"]
 
 # Discord bot — no HTTP server, no port to expose
 
-USER node
-
+# Entrypoint runs as root to fix volume ownership, then drops to node via su-exec
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["node", "index.js"]
