@@ -8,8 +8,8 @@ RUN apk add --no-cache python3 make g++ ca-certificates
 
 COPY package*.json ./
 
-# npm install triggers postinstall which downloads the yt-dlp binary
-RUN npm install
+# npm ci triggers postinstall which downloads the yt-dlp binary
+RUN npm ci
 
 COPY . .
 
