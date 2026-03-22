@@ -1,0 +1,13 @@
+node_modules
+.git
+.env
+audio_cache
+database
+docs
+*.bat
+*.log
+README*.md
+SHARDING.md
+YOUTUBE_FIX.md
+PRIVACY_POLICY.md
+TERMS_OF_SERVICE.md
