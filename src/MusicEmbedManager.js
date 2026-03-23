@@ -74,9 +74,21 @@ class MusicEmbedManager {
 
                     // Ses kanalına bağlan ve çalmaya başla
                     try {
-                        if (!player.connection) {
-                            await player.connect();
+                        // Run voice connect and YouTube stream pre-resolution in parallel.
+                        // getStream() writes to StreamURLCache so player.play() finds it
+                        // cached and skips the yt-dlp call entirely.
+                        const connectPromise = !player.connection
+                            ? player.connect()
+                            : Promise.resolve();
+
+                        let preResolvePromise = Promise.resolve();
+                        if (track.platform === 'youtube' && track.url) {
+                            const YouTube = require('./YouTube');
+                            // Errors are safe to swallow — play() calls getStream() as fallback
+                            preResolvePromise = YouTube.getStream(track.url, guildId).catch(() => {});
                         }
+
+                        await Promise.all([connectPromise, preResolvePromise]);
                         await player.play();
 
                         // Yeni embed oluştur
