@@ -88,7 +88,7 @@ class MusicEmbedManager {
 
                         let preResolvePromise = Promise.resolve();
                         if (track.platform === 'youtube' && track.url) {
-                            const YouTube = require('./YouTube');
+                            const YouTube = require('../YouTube');
                             // Errors are safe to swallow — play() calls getStream() as fallback
                             preResolvePromise = YouTube.getStream(track.url, guildId).catch(() => {});
                         }

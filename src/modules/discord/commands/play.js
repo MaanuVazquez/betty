@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const MusicPlayer = require('../../discord/MusicPlayer');
-const MusicEmbedManager = require('../../discord/MusicEmbedManager');
+const MusicPlayer = require('../MusicPlayer');
+const MusicEmbedManager = require('../MusicEmbedManager');
 const LanguageManager = require('../../LanguageManager');
 const ErrorHandler = require('../../../utils/ErrorHandler');
 

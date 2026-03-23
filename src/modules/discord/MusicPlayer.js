@@ -587,7 +587,7 @@ class MusicPlayer {
                     downloadUrl = track.youtubeUrl;
                 } else {
                     // Search YouTube and use that URL
-                    const YouTube = require('./YouTube');
+                    const YouTube = require('../YouTube');
                     const query = track.platform === 'spotify' 
                         ? `${track.title} ${track.artist}`
                         : track.title;

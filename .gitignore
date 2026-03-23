@@ -17,3 +17,5 @@
 *.local.json
 *.local.md
 nul
+database/*.txt
+database/*.sql
