@@ -1,8 +1,8 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const MusicPlayer = require('../src/MusicPlayer');
-const MusicEmbedManager = require('../src/MusicEmbedManager');
-const LanguageManager = require('../src/LanguageManager');
-const ErrorHandler = require('../src/ErrorHandler');
+const MusicPlayer = require('../../discord/MusicPlayer');
+const MusicEmbedManager = require('../../discord/MusicEmbedManager');
+const LanguageManager = require('../../LanguageManager');
+const ErrorHandler = require('../../../utils/ErrorHandler');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -118,10 +118,10 @@ module.exports = {
     },
 
     async getTrackData(query, guildId) {
-        const YouTube = require('../src/YouTube');
-        const Spotify = require('../src/Spotify');
-        const SoundCloud = require('../src/SoundCloud');
-        const DirectLink = require('../src/DirectLink');
+        const YouTube = require('../../YouTube');
+        const Spotify = require('../../Spotify');
+        const SoundCloud = require('../../SoundCloud');
+        const DirectLink = require('../../DirectLink');
 
         try {
             let tracks = [];

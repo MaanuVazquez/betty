@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits } = require('discord.js');
-const config = require('../config.js');
-const YouTube = require('../src/YouTube.js');
-const LanguageManager = require('../src/LanguageManager');
+const config = require('../../../constants/config');
+const YouTube = require('../../modules/YouTube');
+const LanguageManager = require('../../modules/LanguageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()

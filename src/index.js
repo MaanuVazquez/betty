@@ -3,12 +3,12 @@ const { getVoiceConnection } = require('@discordjs/voice');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 const path = require('path');
-const config = require('./config');
-const PlayerStateManager = require('./src/PlayerStateManager');
-const MusicPlayer = require('./src/MusicPlayer');
+const config = require('./constants/config');
+const PlayerStateManager = require('./modules/PlayerStateManager');
+const MusicPlayer = require('./modules/discord/MusicPlayer');
 const chalk = require('chalk');
 
-require("./src/commandLoader"); // Load and deploy commands
+require("./utils/commandLoader"); // Load and deploy commands
 
 // Clean up audio cache directory on startup
 async function cleanupAudioCache() {
@@ -142,7 +142,7 @@ setTimeout(() => {
     client.players = new Collection();
 
     // Initialize Music Embed Manager
-    const MusicEmbedManager = require('./src/MusicEmbedManager');
+    const MusicEmbedManager = require('./modules/discord/MusicEmbedManager');
     client.musicEmbedManager = new MusicEmbedManager(client);
 
     // Global reference for MusicPlayer'dan erişim

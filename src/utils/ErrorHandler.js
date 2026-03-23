@@ -1,4 +1,4 @@
-const LanguageManager = require('./LanguageManager');
+const LanguageManager = require('../modules/LanguageManager');
 
 /**
  * Classifies a raw error into a known category and returns a localized,

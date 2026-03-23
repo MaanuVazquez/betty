@@ -3,7 +3,7 @@ const config = require('./config');
 const chalk = require('chalk');
 
 // Create sharding manager
-const manager = new ShardingManager('./index.js', {
+const manager = new ShardingManager('./src/index.js', {
     token: config.discord.token,
     totalShards: config.sharding?.totalShards || 'auto', // 'auto' will automatically calculate optimal shard count
     shardList: config.sharding?.shardList || 'auto',

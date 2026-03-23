@@ -1,11 +1,11 @@
 const { REST, Routes } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const config = require('../config');
+const config = require('../constants/config');
 
 // Load all command files
 const commands = [];
-const commandsPath = path.join(__dirname, '..', 'commands');
+const commandsPath = path.join(__dirname, '..', 'modules', 'discord', 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {

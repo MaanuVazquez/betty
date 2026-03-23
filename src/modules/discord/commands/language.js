@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Butt
 const { JsonDB } = require('node-json-db');
 const fs = require('fs');
 const path = require('path');
-const LanguageManager = require('../src/LanguageManager');
+const LanguageManager = require('../../modules/LanguageManager');
 
 // Initialize JSON database
 const db = new JsonDB('database/languages', true, true, '/');
@@ -40,7 +40,7 @@ module.exports = {
             }
 
             // Get available languages
-            const languagesPath = path.join(__dirname, '..', 'languages');
+            const languagesPath = path.join(__dirname, '..', '..', 'constants', 'languages');
             const languageFiles = fs.readdirSync(languagesPath).filter(file => file.endsWith('.json'));
 
             const languages = [];

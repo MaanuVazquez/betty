@@ -1,6 +1,6 @@
 const { Events, EmbedBuilder } = require('discord.js');
-const config = require('../config');
-const LanguageManager = require('../src/LanguageManager');
+const config = require('../../../constants/config');
+const LanguageManager = require('../../LanguageManager');
 
 module.exports = {
     name: Events.InteractionCreate,

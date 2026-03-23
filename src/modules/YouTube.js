@@ -1,5 +1,5 @@
 const youtubedl = require('youtube-dl-exec');
-const config = require('../config');
+const config = require('../constants/config');
 const LanguageManager = require('./LanguageManager');
 
 class YouTube {

@@ -1,6 +1,6 @@
 const youtubedl = require('youtube-dl-exec');
 const axios = require('axios');
-const config = require('../config');
+const config = require('../constants/config');
 const LanguageManager = require('./LanguageManager');
 
 class SoundCloud {

@@ -1,7 +1,7 @@
 const { Events, EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ButtonBuilder, ButtonStyle } = require('discord.js');
-const config = require('../config');
-const LanguageManager = require('../src/LanguageManager');
-const MusicPlayer = require('../src/MusicPlayer');
+const config = require('../../../constants/config');
+const LanguageManager = require('../../LanguageManager');
+const MusicPlayer = require('../MusicPlayer');
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -19,7 +19,7 @@ module.exports = {
 
         // Language selection buttons
         if (interaction.customId.startsWith('language_')) {
-            const languageCommand = require('../commands/language.js');
+            const languageCommand = require('../commands/language');
             return await languageCommand.handleLanguageButton(interaction);
         }
 
@@ -784,7 +784,7 @@ module.exports = {
                 activeServers = client.players.size;
             }
 
-            const helpCommand = require('../commands/help.js');
+            const helpCommand = require('../commands/help');
             const statsServers = await LanguageManager.getTranslation(guildId, 'commands.help.stats_servers', { count: guilds });
             const statsUsers = await LanguageManager.getTranslation(guildId, 'commands.help.stats_users', { count: users.toLocaleString() });
             const statsActive = await LanguageManager.getTranslation(guildId, 'commands.help.stats_active', { count: activeServers });
@@ -924,7 +924,7 @@ module.exports = {
 
         try {
             // Embed Manager ile işle
-            const MusicEmbedManager = require('../src/MusicEmbedManager');
+            const MusicEmbedManager = require('../MusicEmbedManager');
             if (!client.musicEmbedManager) {
                 client.musicEmbedManager = new MusicEmbedManager(client);
             }

@@ -1,6 +1,6 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const config = require('../config');
-const LanguageManager = require('./LanguageManager');
+const config = require('../../constants/config');
+const LanguageManager = require('../LanguageManager');
 
 class MusicEmbedManager {
     constructor(client) {

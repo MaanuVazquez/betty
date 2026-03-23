@@ -8,14 +8,14 @@ const {
     StreamType
 } = require('@discordjs/voice');
 const { EmbedBuilder } = require('discord.js');
-const config = require('../config');
-const YouTube = require('./YouTube');
-const Spotify = require('./Spotify');
-const SoundCloud = require('./SoundCloud');
-const DirectLink = require('./DirectLink');
-const LanguageManager = require('./LanguageManager');
-const ErrorHandler = require('./ErrorHandler');
-const PlayerStateManager = require('./PlayerStateManager');
+const config = require('../../constants/config');
+const YouTube = require('../YouTube');
+const Spotify = require('../Spotify');
+const SoundCloud = require('../SoundCloud');
+const DirectLink = require('../DirectLink');
+const LanguageManager = require('../LanguageManager');
+const ErrorHandler = require('../../utils/ErrorHandler');
+const PlayerStateManager = require('../PlayerStateManager');
 const prism = require('prism-media');
 const ffmpegPath = 'ffmpeg';
 const { promisify } = require('util');
