@@ -16,7 +16,6 @@ const DirectLink = require('./DirectLink');
 const LanguageManager = require('./LanguageManager');
 const ErrorHandler = require('./ErrorHandler');
 const PlayerStateManager = require('./PlayerStateManager');
-const LyricsManager = require('./LyricsManager');
 const prism = require('prism-media');
 const ffmpegPath = 'ffmpeg';
 const { promisify } = require('util');
@@ -108,9 +107,6 @@ class MusicPlayer {
         this.activeStreamInfo = null;
         this.lastPlaybackPosition = 0;
         this.currentTrackStartOffsetMs = 0;
-
-        // Lyrics system (button-only, no sync)
-        this.currentLyrics = null; // Lyrics data for current track
 
         // Persistence management
         this.stateSyncInterval = null;
@@ -1081,9 +1077,6 @@ class MusicPlayer {
 
             this.startStateSync();
             await this.persistState(resumeFromMs > 0 ? 'resume-playback' : 'play');
-
-            // Fetch and start lyrics system
-            this.fetchAndStartLyrics();
 
             return { success: true, track: this.currentTrack };
 
@@ -2183,39 +2176,6 @@ class MusicPlayer {
             this.stateSaveTimeout = null;
         }
     }
-
-    // ==================== LYRICS SYSTEM ====================
-
-    async fetchAndStartLyrics() {
-        try {
-            if (!this.currentTrack) return;
-
-            // Fetch lyrics in background (no sync, button-only display)
-            this.currentLyrics = await LyricsManager.fetchLyrics(this.currentTrack);
-
-            if (this.currentLyrics && this.currentLyrics.plain) {
-                const sourceLabel = this.currentLyrics.source ? ` via ${this.currentLyrics.source}` : '';
-                // Update now playing embed to enable lyrics button
-                const embedManager = global.clients?.musicEmbedManager;
-                if (embedManager && this.nowPlayingMessage) {
-                    try {
-                        await embedManager.updateNowPlayingEmbed(this);
-                    } catch (error) {
-                        // Ignore update errors
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('❌ Failed to fetch lyrics:', error.message);
-            this.currentLyrics = null;
-        }
-    }
-
-    hasLyrics() {
-        return Boolean(this.currentLyrics && this.currentLyrics.plain);
-    }
-
-    // ==================== END LYRICS SYSTEM ====================
 
     scheduleStatePersist(reason = 'update', delay = 200) {
         this.cancelStateSave();
