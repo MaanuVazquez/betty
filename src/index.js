@@ -1,12 +1,126 @@
-const { Client, GatewayIntentBits, Collection, Events, ActivityType } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, Events, ActivityType, ShardingManager } = require('discord.js');
 const { getVoiceConnection } = require('@discordjs/voice');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 const path = require('path');
 const config = require('./constants/config');
+const chalk = require('chalk');
+
+// Check if running in shard manager mode
+const isShardManager = process.argv.includes('--shard');
+
+if (isShardManager) {
+    // Remove --shard from args before passing to shards
+    const shardArgs = process.argv.slice(2).filter(arg => arg !== '--shard');
+
+    // Create sharding manager
+    const manager = new ShardingManager(__filename, {
+        token: config.discord.token,
+        totalShards: config.sharding?.totalShards || 'auto',
+        shardList: config.sharding?.shardList || 'auto',
+        mode: config.sharding?.mode || 'process',
+        respawn: config.sharding?.respawn !== false,
+        shardArgs: shardArgs,
+        execArgv: process.execArgv,
+    });
+
+    // Event: Shard is being created
+    manager.on('shardCreate', shard => {
+        console.log(chalk.cyan(`[SHARD MANAGER] Launching shard ${shard.id}...`));
+
+        shard.on('ready', () => {
+            console.log(chalk.green(`[SHARD ${shard.id}] ✅ Shard ${shard.id} is ready!`));
+        });
+
+        shard.on('disconnect', () => {
+            console.log(chalk.yellow(`[SHARD ${shard.id}] ⚠️ Shard ${shard.id} disconnected`));
+        });
+
+        shard.on('reconnecting', () => {
+            console.log(chalk.blue(`[SHARD ${shard.id}] 🔄 Shard ${shard.id} reconnecting...`));
+        });
+
+        shard.on('death', (process) => {
+            if (process.exitCode === null) {
+                console.log(chalk.red(`[SHARD ${shard.id}] 💀 Shard ${shard.id} died with unknown error, restarting...`));
+            } else {
+                console.log(chalk.red(`[SHARD ${shard.id}] 💀 Shard ${shard.id} died with exit code ${process.exitCode}, restarting...`));
+            }
+        });
+
+        shard.on('error', (error) => {
+            console.error(chalk.red(`[SHARD ${shard.id}] ❌ Shard ${shard.id} encountered an error:`), error);
+        });
+    });
+
+    // Error handling
+    process.on('unhandledRejection', (reason, promise) => {
+        console.error(chalk.red('❌ Unhandled Rejection in Shard Manager:'), reason);
+    });
+
+    process.on('uncaughtException', (error) => {
+        console.error(chalk.red('❌ Uncaught Exception in Shard Manager:'), error);
+    });
+
+    // Graceful shutdown
+    process.on('SIGINT', async () => {
+        console.log(chalk.yellow('\n⚠️  Shutting down all shards...'));
+
+        try {
+            await manager.broadcastEval((client) => {
+                client.players.forEach((player, guildId) => {
+                    player.stop();
+                    const { getVoiceConnection } = require('@discordjs/voice');
+                    const connection = getVoiceConnection(guildId);
+                    if (connection) connection.destroy();
+                });
+                client.destroy();
+            });
+
+            console.log(chalk.green('✅ All shards shut down successfully'));
+            process.exit(0);
+        } catch (error) {
+            console.error(chalk.red('❌ Error during shutdown:'), error);
+            process.exit(1);
+        }
+    });
+
+    // Start sharding
+    console.log(chalk.blue('🚀 Starting Discord Music Bot with Sharding...'));
+    console.log(chalk.blue(`📊 Sharding Mode: ${config.sharding?.mode || 'process'}`));
+    console.log(chalk.blue(`🔢 Total Shards: ${config.sharding?.totalShards || 'auto'}`));
+    console.log(chalk.blue('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+
+    manager.spawn({
+        amount: config.sharding?.totalShards || 'auto',
+        delay: config.sharding?.spawnDelay || 5500,
+        timeout: config.sharding?.spawnTimeout || 30000,
+    }).then(async shards => {
+        console.log(chalk.green(`\n✅ Successfully spawned ${shards.size} shard(s)`));
+        console.log(chalk.cyan('\n⏳ Waiting for all shards to stabilize before restoring sessions...'));
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        console.log(chalk.cyan('🔄 Broadcasting session restore to all shards...'));
+
+        await manager.broadcastEval(async (client) => {
+            if (typeof client.restoreSessions === 'function') {
+                await client.restoreSessions();
+            }
+        }).catch(err => {
+            console.error(chalk.red('❌ Error broadcasting restore:'), err.message);
+        });
+
+        console.log(chalk.green('✅ Session restore broadcast complete'));
+    }).catch(error => {
+        console.error(chalk.red('❌ Failed to spawn shards:'), error);
+        process.exit(1);
+    });
+
+    return;
+}
+
+// BOT CLIENT MODE (when not running as shard manager)
 const PlayerStateManager = require('./modules/PlayerStateManager');
 const MusicPlayer = require('./modules/discord/MusicPlayer');
-const chalk = require('chalk');
 
 require("./utils/commandLoader"); // Load and deploy commands
 

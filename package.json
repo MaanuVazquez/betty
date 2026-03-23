@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "node src/index.js",
-    "shard": "node src/shard.js",
+    "shard": "node src/index.js --shard",
     "test": "node --check src/index.js",
     "postinstall": "node scripts/update-ytdlp.js"
   },
