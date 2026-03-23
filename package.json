@@ -2,12 +2,12 @@
   "name": "musicbot",
   "version": "16.0.0",
   "description": "Advanced Discord v14.22 Music Bot with YouTube, Spotify, SoundCloud, and Direct Link support",
-  "main": "index.js",
+  "main": "src/index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node index.js",
-    "shard": "node shard.js",
-    "test": "node --check index.js",
+    "start": "node src/index.js",
+    "shard": "node src/shard.js",
+    "test": "node --check src/index.js",
     "postinstall": "node scripts/update-ytdlp.js"
   },
   "keywords": [
