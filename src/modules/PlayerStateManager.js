@@ -1,7 +1,8 @@
 const path = require('path');
 const fs = require('fs');
+const paths = require('../constants/paths');
 
-const DB_FILE_PATH = path.join(__dirname, '..', 'database', 'playerState.json');
+const DB_FILE_PATH = paths.playerState;
 
 class PlayerStateManager {
     constructor() {

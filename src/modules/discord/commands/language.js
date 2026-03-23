@@ -10,9 +10,10 @@ const { JsonDB } = require("node-json-db");
 const fs = require("fs");
 const path = require("path");
 const LanguageManager = require("../../LanguageManager");
+const paths = require("../../../constants/paths");
 
 // Initialize JSON database
-const db = new JsonDB("database/languages", true, true, "/");
+const db = new JsonDB(paths.languageDb, true, true, "/");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -58,13 +59,7 @@ module.exports = {
       }
 
       // Get available languages
-      const languagesPath = path.join(
-        __dirname,
-        "..",
-        "..",
-        "constants",
-        "languages",
-      );
+      const languagesPath = paths.languages;
       const languageFiles = fs
         .readdirSync(languagesPath)
         .filter((file) => file.endsWith(".json"));

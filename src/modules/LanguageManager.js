@@ -1,16 +1,17 @@
 const { JsonDB } = require('node-json-db');
 const fs = require('fs');
 const path = require('path');
+const paths = require('../constants/paths');
 
 // Initialize JSON database
-const db = new JsonDB('database/languages', true, true, '/');
+const db = new JsonDB(paths.languageDb, true, true, '/');
 
 /**
  * Language utility functions for the Discord bot
  */
 class LanguageManager {
     constructor() {
-        this.languagesPath = path.join(__dirname, '..', 'constants', 'languages');
+        this.languagesPath = paths.languages;
         this.defaultLanguage = 'en';
         this.loadedLanguages = new Map();
         this.serverLanguageCache = new Map(); // Cache for server languages

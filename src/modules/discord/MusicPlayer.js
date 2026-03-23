@@ -26,9 +26,10 @@ const fs = require('fs').promises;
 const fsSync = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const paths = require('../../constants/paths');
 
 // Cache directory for downloaded audio files
-const CACHE_DIR = path.join(__dirname, '..', 'audio_cache');
+const CACHE_DIR = paths.audioCache;
 
 // Ensure cache directory exists
 if (!fsSync.existsSync(CACHE_DIR)) {

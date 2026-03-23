@@ -1,9 +1,9 @@
 // Load environment variables
 require("dotenv").config();
 const fs = require("fs");
-const path = require("path");
+const paths = require("./paths");
 
-const defaultCookiesPath = path.join(__dirname, "database", "cookies.txt");
+const defaultCookiesPath = paths.cookies;
 const cookiesFile =
   process.env.COOKIES_FILE ||
   (fs.existsSync(defaultCookiesPath) ? defaultCookiesPath : null);

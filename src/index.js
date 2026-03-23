@@ -4,6 +4,7 @@ const fs = require('fs');
 const fsPromises = require('fs').promises;
 const path = require('path');
 const config = require('./constants/config');
+const paths = require('./constants/paths');
 const chalk = require('chalk');
 
 // Check if running in shard manager mode
@@ -126,7 +127,7 @@ require("./utils/commandLoader"); // Load and deploy commands
 
 // Clean up audio cache directory on startup
 async function cleanupAudioCache() {
-    const cacheDir = path.join(__dirname, 'audio_cache');
+    const cacheDir = paths.audioCache;
 
     try {
         if (fs.existsSync(cacheDir)) {
@@ -265,7 +266,7 @@ setTimeout(() => {
 
     // Load command files
     const loadCommands = () => {
-        const commandsPath = path.join(__dirname, 'commands');
+        const commandsPath = paths.commands;
 
         // Create commands directory if it doesn't exist
         if (!fs.existsSync(commandsPath)) {
@@ -293,7 +294,7 @@ setTimeout(() => {
 
     // Load event handlers
     const loadEvents = () => {
-        const eventsPath = path.join(__dirname, 'events');
+        const eventsPath = paths.events;
 
         // Create events directory if it doesn't exist
         if (!fs.existsSync(eventsPath)) {
