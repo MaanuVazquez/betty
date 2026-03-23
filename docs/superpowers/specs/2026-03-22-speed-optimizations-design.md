@@ -37,9 +37,11 @@ No interval timer needed — lazy cleanup on each `set()`.
 
 ### 2. `YouTube.getStream()` — wrap with cache
 
-Before invoking yt-dlp, check `StreamURLCache.get(url)`. On miss, invoke yt-dlp as today and call `StreamURLCache.set(url, result)` before returning.
+Before invoking yt-dlp, check `StreamURLCache.get(url)` **only when `startSeconds === 0`**. Seeks embed a `begin=` offset into the CDN URL — cached URLs from `startSeconds=0` fetches must not be reused for seeks, or the resumed track starts from the wrong position. When `startSeconds > 0`, always call yt-dlp and do not write the result to the cache.
 
-`preloadTrack()` already calls `getStream()` for queued tracks while the current track plays. By the time `play()` runs for that track, the cache is warm and `getStream()` returns in <1 ms instead of 1.5–3 sec.
+On a cache miss with `startSeconds === 0`: invoke yt-dlp as today and call `StreamURLCache.set(url, result)` before returning.
+
+`preloadTrack()` calls `getStream()` for queued tracks while the current track plays — this write to `StreamURLCache` is automatic. By the time `play()` runs for a queued track, the cache is warm and `getStream()` returns in <1 ms instead of 1.5–3 sec.
 
 ### 3. `YouTube.search()` — drop `getInfo()` fallback
 
@@ -47,11 +49,28 @@ Remove the block that calls `getInfo()` when a search result has `duration === 0
 
 ### 4. `MusicPlayer.play()` — skip `getStream()` when file on disk
 
-Before the `getStream()` call, check if the cached opus file already exists on disk (`audio_cache/track_<md5>.opus` with size > 0). If it does, skip `getStream()` entirely — set `shouldDownload = false` and go straight to file playback. The CDN URL is only needed for direct streaming (cache miss on disk).
+Before the `getStream()` call, check if the cached opus file already exists on disk (`audio_cache/track_<md5>.opus` with size > 0) **and `seekMs === 0`**. If it does, skip `getStream()` entirely: set `shouldDownload = false`, set `downloadedFile` to the cached path, and synthesize a minimal `streamInfo` from the track object:
 
-### 5. `commands/play.js` — parallel voice connect + search
+```js
+streamInfo = {
+    url: null,
+    duration: currentTrack.duration || 0,
+    bitrate: currentTrack.bitrate || 128,
+    type: 'opus',
+    canSeek: false,
+    httpHeaders: {}
+};
+```
 
-After creating the player object, fire both `player.connect()` (if not already connected) and `getTrackData()` concurrently using `Promise.allSettled`. Pass the result of `getTrackData` into `handleMusicData` as before. `_processMusic` skips `connect()` if `player.connection` is already set.
+This satisfies the watchdog, metadata fields, and downstream consumers without a yt-dlp call. For seeks (`seekMs > 0`), always call `getStream()` as today since the cached file must be re-streamed from offset.
+
+### 5. `MusicEmbedManager._processMusic()` — parallel voice connect + stream resolution
+
+The `connect()` call lives in `_processMusic` (line ~77), not in `play.js`. `play()` internally calls `getStream()` which takes 1.5–3 sec. These two operations are independent and can run in parallel.
+
+Change `_processMusic` so that when the player is idle (first track): fire `player.connect()` and `YouTube.getStream(firstTrack.url)` (or the appropriate provider's `getStream`) concurrently with `Promise.all`. Cache the resolved `streamInfo` in `StreamURLCache` so that when `player.play()` runs immediately after, `getStream()` returns from cache instantly.
+
+If `player.connection` already exists (bot already in channel), skip the connect and only call `getStream()` — no change from today's behavior.
 
 ### 6. `MusicEmbedManager.sequentialPreload()` → parallel (concurrency 2)
 
@@ -84,8 +103,7 @@ After removal: run `npm install` to regenerate `package-lock.json`.
 | `src/StreamURLCache.js` | New | TTL cache for CDN stream URLs |
 | `src/YouTube.js` | Modify | Wrap `getStream()` with cache; drop `getInfo()` in `search()` |
 | `src/MusicPlayer.js` | Modify | Skip `getStream()` when file on disk; remove lyrics |
-| `src/MusicEmbedManager.js` | Modify | Parallel preload (concurrency 2); remove lyrics |
-| `commands/play.js` | Modify | Parallel connect + search |
+| `src/MusicEmbedManager.js` | Modify | Parallel connect + stream resolve in `_processMusic`; parallel preload (concurrency 2); remove lyrics |
 | `events/buttonHandler.js` | Modify | Remove lyrics handler |
 | `src/LyricsManager.js` | Delete | — |
 | `package.json` | Modify | Remove `genius-lyrics` |
