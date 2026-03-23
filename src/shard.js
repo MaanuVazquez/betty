@@ -1,5 +1,5 @@
 const { ShardingManager } = require('discord.js');
-const config = require('./config');
+const config = require('./constants/config');
 const chalk = require('chalk');
 
 // Create sharding manager
