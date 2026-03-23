@@ -81,16 +81,6 @@ class YouTube {
                         description: item.description,
                     };
 
-                    // If duration is missing from search, try to get it from getInfo
-                    if (!track.duration || track.duration === 0) {
-
-                        const detailedInfo = await this.getInfo(track.url, guildId);
-                        if (detailedInfo && detailedInfo.duration) {
-                            track.duration = detailedInfo.duration;
-
-                        }
-                    }
-
                     tracks.push(track);
                 } catch (error) {
                     continue;
