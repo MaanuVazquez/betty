@@ -156,6 +156,15 @@ class YouTube {
                 throw new Error(errorMsg);
             }
 
+            const StreamURLCache = require('./StreamURLCache');
+
+            // Cache hit — only for fresh plays. Seeks embed begin= in the CDN URL
+            // so a cached startSeconds=0 URL must never be reused for a seek.
+            if (startSeconds === 0) {
+                const cached = StreamURLCache.get(url);
+                if (cached) return cached;
+            }
+
             // Get stream URL with simple format
             const info = await youtubedl(url, this.getYtDlpOptions({
                 dumpSingleJson: true,
@@ -178,7 +187,7 @@ class YouTube {
                 finalUrl = `${baseUrl}${separator}begin=${startMs}`;
             }
 
-            return {
+            const result = {
                 url: finalUrl,
                 rawUrl: baseUrl,
                 type: info.acodec && info.acodec.includes('opus') ? 'opus' : 'arbitrary',
@@ -188,6 +197,14 @@ class YouTube {
                 format: info.format,
                 httpHeaders: info.http_headers || {}
             };
+
+            // Cache only for fresh plays — seeks write a URL with begin= offset
+            // that must not be reused for non-seek calls.
+            if (startSeconds === 0) {
+                StreamURLCache.set(url, result);
+            }
+
+            return result;
 
         } catch (error) {
             throw error;
