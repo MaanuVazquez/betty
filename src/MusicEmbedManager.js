@@ -10,24 +10,29 @@ class MusicEmbedManager {
     }
 
     /**
-     * Queue'daki track'leri sırayla preload eder (donmayı önler)
+     * Pre-downloads queued tracks in parallel (concurrency 2) to fill the
+     * opus file cache while the current track plays.
      */
-    async sequentialPreload(player, tracks) {
-        for (const track of tracks) {
-            // Eğer bu track zaten preload edilmişse veya preload sırasındaysa atla
-            if (player.preloadedStreams.has(track.url) || player.preloadingQueue.includes(track.url)) {
-                continue;
-            }
+    async parallelPreload(player, tracks) {
+        const CONCURRENCY = 2;
+        let index = 0;
 
-            try {
-                await player.preloadTrack(track);
-                // Her preload arasında kısa bekleme (sistem yükünü azaltmak için)
-                await new Promise(resolve => setTimeout(resolve, 100));
-            } catch (err) {
-                console.error(`❌ Preload error for ${track.title}:`, err.message);
-                // Hata olsa bile devam et
+        const runWorker = async () => {
+            while (index < tracks.length) {
+                const track = tracks[index++];
+                if (
+                    player.preloadedStreams.has(track.url) ||
+                    player.preloadingQueue.includes(track.url)
+                ) continue;
+                try {
+                    await player.preloadTrack(track);
+                } catch (err) {
+                    console.error(`❌ Preload error for ${track.title}:`, err.message);
+                }
             }
-        }
+        };
+
+        await Promise.all(Array.from({ length: CONCURRENCY }, runWorker));
     }
 
     /**
@@ -106,8 +111,8 @@ class MusicEmbedManager {
             }
 
             // Preload'ı tetikle - queue'daki track'leri sırayla preload et (donmayı önlemek için)
-            this.sequentialPreload(player, player.queue.slice()).catch(err =>
-                console.error('❌ Sequential preload error:', err.message)
+            this.parallelPreload(player, player.queue.slice()).catch(err =>
+                console.error('❌ Parallel preload error:', err.message)
             );
 
             // Eğer ilk şarkıyı çalmaya başladıysak ve playlist'te başka şarkılar varsa
