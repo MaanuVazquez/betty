@@ -768,6 +768,26 @@ class MusicPlayer {
                 this.preloadedStreams.delete(this.currentTrack.url);
             }
 
+            // Fast path: opus file already on disk and no seek requested.
+            // Synthesise a minimal streamInfo to skip the getStream() yt-dlp call entirely.
+            // The existing downloadedFile block below confirms the file and sets shouldDownload=false.
+            // rawUrl is null here — safe because seeks are guarded by resumeFromMs === 0.
+            if (!streamInfo && resumeFromMs === 0) {
+                const hash = crypto.createHash('md5').update(this.currentTrack.url).digest('hex');
+                const cachedPath = path.join(CACHE_DIR, `track_${hash}.opus`);
+                if (fsSync.existsSync(cachedPath) && fsSync.statSync(cachedPath).size > 0) {
+                    streamInfo = {
+                        url: null,
+                        rawUrl: null,
+                        duration: this.currentTrack.duration || 0,
+                        bitrate: this.currentTrack.bitrate || 128,
+                        type: 'opus',
+                        canSeek: false,
+                        httpHeaders: {}
+                    };
+                }
+            }
+
             if (!streamInfo) {
                 // Get stream normally
                 switch (this.currentTrack.platform) {
