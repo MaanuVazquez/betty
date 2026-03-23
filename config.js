@@ -25,12 +25,6 @@ module.exports = {
       process.env.SPOTIFY_CLIENT_SECRET || "YOUR_SPOTIFY_CLIENT_SECRET",
   },
 
-  // Genius API Settings
-  genius: {
-    clientId: process.env.GENIUS_CLIENT_ID || "",
-    clientSecret: process.env.GENIUS_CLIENT_SECRET || "",
-  },
-
   // Bot Settings
   bot: {
     defaultVolume: 100,

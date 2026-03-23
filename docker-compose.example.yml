@@ -19,8 +19,6 @@ services:
 
       # ── Optional ────────────────────────────────────────────────────────────
       GUILD_ID: ""                    # Set for faster guild-scoped command deploy
-      GENIUS_CLIENT_ID: ""            # Higher Genius API rate limits
-      GENIUS_CLIENT_SECRET: ""
       STATUS: "🎵 Betty | /play"
       EMBED_COLOR: "#FF6B6B"
       SUPPORT_SERVER: "https://discord.gg/"
